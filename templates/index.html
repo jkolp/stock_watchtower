@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>
+    Watch Tower
+</title>
+{% endblock %}
+
+{% block body %}
+
+<!-- side bar -->
+<div class="side_nav">
+    <img id="logo" src="">
+    <img class="nav_icon" src="">
+    <img class="nav_icon" src="">
+    <img class="nav_icon" src="">
+</div>
+
+
+<div class="dashboard">
+    <!-- Search bar and Profile icon -->
+    <div class="upper_bar">
+        <div class="search_bar">
+            <!-- <form action="/" method="GET"> -->
+                <input type="image" onclick="display_chart()" class="search_icon" src="{{ url_for('static', filename='assets/search_icon.png') }}">
+                <input class="text_input" name="stock_ticker" type="text" placeholder="Search stock name">
+            <!-- </form> -->
+                <div>
+
+                </div>
+        </div>
+
+        <img id="profile_icon" src="">
+        <p id="profile_name"> Hangu Lee </p>
+    </div>
+    
+    <!-- Graph -->
+    <div class="graph_section">
+        <div id="chart_container">
+
+        </div>
+    </div>
+
+    <!-- Watchlist -->
+    <div class="watchlist">
+        <h3> Watchlist </h3>
+        <div class="watchlist_wrapper">
+            <!-- <div class="watchlist_stock"> </div> -->
+            {% if watchlist|length < 1 %}
+                <h4> Nothing in the Watchlist </h4>
+            {% else %}
+                {% for stock in watchlist %}
+                    <div class="watchlist_stock"> {{ stock.stock_name }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
