@@ -1,4 +1,11 @@
 
+#chart_container {
+    height:450px;
+    width: 900px;
+    background-color: black;
+    border-radius: 25px;
+    margin-left: 8%;
+}
 
 #logo {
     width: 100px;
@@ -27,12 +34,7 @@
     display: inline-block;
 }
 
-.chart_container {
-    height:450px;
-    width: 900px;
-    background-color: black;
-    margin-left: 8%;
-}
+
 
 .dashboard {
     margin-left: 150px;

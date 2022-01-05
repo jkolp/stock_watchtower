@@ -1,9 +1,9 @@
-import requests
-from controllers.watchlist_controller import display_current_watchlist
-from flask import Flask, render_template, url_for, request, redirect
+from controllers.watchlist_controller import display_current_watchlist, get_stock_obj
+from flask import Flask, render_template, url_for, request, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from models.Stock import Stock
 from controllers.watchlist_controller import fetch_stock_profile, fetch_stock_history
+import requests
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///watchList.db'
@@ -19,7 +19,7 @@ with app.app_context():
 @app.route('/', methods=['GET'])
 def index():
     if request.args.get('stock_ticker') == None :
-        watchlist = [Stock(stock_name="apple"), Stock(stock_name="facebook")] # testing code
+        watchlist = [Stock(stock_ticker="AAPL"), Stock(stock_ticker="FB")] # testing code
         return render_template('index.html', watchlist=watchlist) 
     else :
         stock_info= request.args.get('stock_ticker')
@@ -27,20 +27,17 @@ def index():
         return stock_info 
 
 
-
-#TODO
-# API that returns JSON response of the stock_ticker info
-# Create model objects then pass as response object
-# Need to figure out how to use callbacks in python
+# API that returns JSON response of the stock info
+# Create model objects then pass create jsonify response
 @app.route('/get_stock_info/<string:stock_ticker>', methods=['GET'])
 def get_stockInfo(stock_ticker):
-
-    fetch_stock_profile(stock_ticker)
-
+    stock = get_stock_obj(stock_ticker)
     
-    fetch_stock_history(stock_ticker)
-
-    return fetch_stock_profile(stock_ticker)
+    #jsonify() makes it return JSON response
+    return jsonify({
+        'stock_name': stock.company_name,
+        'prices_history': stock.prices_history
+    })
     
 
 

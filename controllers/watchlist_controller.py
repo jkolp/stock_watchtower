@@ -1,37 +1,61 @@
 from flask import Flask, render_template, url_for, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from models.Stock import Stock, db
-import requests
+import requests, json
 
 
-def fetch_stock_profile(ticker, callback):
+def get_stock_obj(ticker):
+    stock = Stock(ticker)
+    stock.company_name = fetch_stock_profile(ticker)['quoteType']['shortName']
+    date_and_close_arr = fetch_stock_history(ticker)['prices']
+
+    # Picking out 'date' and 'close' price only and save into prices_history
+    for price_dict in date_and_close_arr:
+        stock.prices_history.append([price_dict['date'], round(price_dict['close'], 2)])
+
+    return stock
+    
+    
+
+def fetch_stock_profile(ticker):
     url = "https://yh-finance.p.rapidapi.com/stock/v2/get-profile"
-
     querystring = {"symbol":ticker,"region":"US"}
-
     headers = {
-    'x-rapidapi-host': "yh-finance.p.rapidapi.com",
-    'x-rapidapi-key': "2ac894d627mshd49f02a7d46c4fdp1aed5fjsnc810b6d13354"
-    }
+        'x-rapidapi-host': "yh-finance.p.rapidapi.com",
+        'x-rapidapi-key': "2ac894d627mshd49f02a7d46c4fdp1aed5fjsnc810b6d13354"
+        }
 
-    response = requests.request("GET", url, headers=headers, params=querystring)
+    try:
+        response = requests.request("GET", url, headers=headers, params=querystring)
+        # json.loads(response.text) turns json to python dictionary
+        return json.loads(response.text)
+    except requests.exceptions.Timeout as err:
+        return err
+    except requests.exceptions.TooManyRedirects as err:
+        return err
+    except requests.exceptions.RequestException as err:
+        # catastrophic error. bail.
+        raise SystemExit(err)
 
-    #jsonify() makes it return JSON response
-    callback(jsonify(response.text))
-
-def fetch_stock_history(ticker, callback):
+def fetch_stock_history(ticker):
     url = "https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data"
-
     querystring = {"symbol":ticker,"region":"US"}
-
     headers = {
     'x-rapidapi-host': "yh-finance.p.rapidapi.com",
     'x-rapidapi-key': "2ac894d627mshd49f02a7d46c4fdp1aed5fjsnc810b6d13354"
     }
 
-    response = requests.request("GET", url, headers=headers, params=querystring)
-    #jsonify() makes it return JSON response
-    callback(jsonify(response.text))
+    try:
+        response = requests.request("GET", url, headers=headers, params=querystring)
+        # json.loads(response.text) turns json to python dictionary 
+        return json.loads(response.text)
+    except requests.exceptions.Timeout as err:
+        return err
+    except requests.exceptions.TooManyRedirects as err:
+        return err
+    except requests.exceptions.RequestException as err:
+        # catastrophic error. bail.
+        raise SystemExit(err)
 
 def display_current_watchlist():
     
